@@ -1,5 +1,8 @@
 import { createStore } from 'vuex'
-
+import cart from './models/cart'
+import user from './models/user'
+import catagory from './models/catagory'
+// vue2创建仓库  new Vuex.Store({})
 export default createStore({
   state: {
   },
@@ -10,5 +13,8 @@ export default createStore({
   actions: {
   },
   modules: {
+    cart,
+    user,
+    catagory
   }
 })
