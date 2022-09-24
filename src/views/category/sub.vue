@@ -1,14 +1,10 @@
 <template>
-  <div>
-    <router-view></router-view>
-  </div>
+  <div class="sub-category">sub-category</div>
 </template>
 
 <script>
-
 export default {
-  name: 'app'
-
+  name: 'sub-category'
 }
 </script>
 
