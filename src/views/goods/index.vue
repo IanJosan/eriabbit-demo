@@ -16,39 +16,66 @@
                 </div>
                 <div class="spec">
                     <GoodsName :goods="goods"/>
+                    <!-- 规格组件 -->
+                    <GoodsSku :goods="goods" @change="changeSku" skuId=""/>
+                    <!-- 数量组件 -->
+                    <XtxNumbox label="数量" v-model="num" :max="goods.inventory"/>
+                    <!-- 按钮组件 -->
+                    <XtxButton type="primary" style="margin-top:20px;">加入购物车</XtxButton>
                 </div>
             </div>
             <!-- 商品推荐 -->
-            <GoodsRelevant />
+            <GoodsRelevant  :goodsId="goods.id"/>
             <!-- 商品详情 -->
             <div class="goods-footer">
                 <div class="goods-article">
                     <!-- 商品+评价 -->
-                    <div class="goods-tabs"></div>
+                    <GoodsTabs/>
                     <!-- 注意事项 -->
-                    <div class="goods-warn"></div>
+                    <div class="goods-warn">
+                        <GoodsWarn />
+                    </div>
                 </div>
                 <!-- 24热榜+专题推荐 -->
-                <div class="goods-aside"></div>
+                <div class="goods-aside">
+                    <GoodsHot  :type="1" />
+                    <GoodsHot  :type="2" />
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import GoodsSku from './components/goods-sku'
 import GoodsRelevant from './components/goods-relevant'
 import GoodsImage from './components/goods-image.vue'
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, provide } from 'vue'
 import { useRoute } from 'vue-router'
 import { findGoods } from '@/api/product'
 import GoodsSales from './components/goods-sales'
 import GoodsName from './components/goods-name'
+import GoodsTabs from './components/goods-tabs'
+import GoodsHot from './components/goods-hot'
+import GoodsWarn from './components/goods-warn'
 export default {
   name: 'XtxGoodsPage',
-  components: { GoodsRelevant, GoodsImage, GoodsSales, GoodsName },
+  components: { GoodsWarn, GoodsHot, GoodsTabs, GoodsRelevant, GoodsImage, GoodsSales, GoodsName, GoodsSku },
   setup () {
     const goods = useGoods()
-    return { goods }
+    // sku改变时候触发
+    const changeSku = (sku) => {
+      if (sku.skuId) {
+        goods.value.price = sku.price
+        goods.value.oldPrice = sku.oldPrice
+        goods.value.inventory = sku.inventory
+      }
+    }
+    // 提供goods数据给后代
+    provide('goods', goods)
+    // 选择的数量
+    const num = ref(1)
+    return { goods, changeSku, num }
   }
 
 }
