@@ -21,7 +21,10 @@
 import LoginHeader from './components/login-header'
 import LoginFooter from './components/login-footer'
 import LoginForm from './components/login-form'
+
 import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { useRoute } from 'vue-router'
 export default {
   name: 'PageLogin',
   components: {
@@ -31,6 +34,9 @@ export default {
   },
   setup () {
     const activeName = ref('account')
+    const store = useStore()
+    const route = useRoute()
+    store.commit('user/setRedirectUrl', route.query.redirectUrl || '/')
     return { activeName }
   }
 }

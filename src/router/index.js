@@ -5,6 +5,7 @@ const topCategory = () => import('@/views/category')
 const subCategory = () => import('@/views/category/sub')
 const Goods = () => import('@/views/goods/index')
 const Login = () => import('@/views/login')
+const LoginCallback = () => import('@/views/login/callback')
 const routes = [
   // 一级路由
   {
@@ -17,7 +18,8 @@ const routes = [
       { path: '/product/:id', component: Goods }
     ]
   },
-  { path: '/login', component: Login }
+  { path: '/login', component: Login },
+  { path: '/login/callback', component: LoginCallback }
 ]
 
 // vue2 new VueRouter({})
