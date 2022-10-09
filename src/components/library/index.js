@@ -58,6 +58,8 @@
 import defaultImg from '@/assets/images/200.png'
 // console.dir(importFn.keys()) 文件名称数组
 import Message from './Message'
+import Confirm from './confirm'
+
 const importFn = require.context('./', false, /\.vue$/)
 export default {
   install (app) {
@@ -78,6 +80,7 @@ export default {
     // 定义指令
     defineDirective(app)
     app.config.globalProperties.$message = Message// 原型函数
+    app.config.globalProperties.$confirm = Confirm// 原型函数
   }
 }
 
