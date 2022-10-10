@@ -150,8 +150,10 @@ export default {
           }
           const { id, account, mobile, nickname, token } = data.result
           store.commit('user/setUser', { id, account, mobile, nickname, token })
-          router.push(route.query.redirectUrl || '/')
-          Message({ type: 'success', text: '登陆成功' })
+          store.dispatch('cart/mergeCart').then(() => {
+            router.push(route.query.redirectUrl || '/')
+            Message({ type: 'success', text: '登陆成功' })
+          })
         }
       } catch (e) {
         if (e.response.data) {
