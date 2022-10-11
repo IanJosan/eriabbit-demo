@@ -7,24 +7,35 @@
           <li><span>联系方式：</span>{{showAddress.contact.replace(/^(\d{3})\d{4}(\d{4})/,'$1****$2')}}</li>
           <li><span>收货地址：</span>{{showAddress.fullLocation}}{{showAddress.address}}</li>
         </ul>
-        <a v-if="showAddress" href="javascript:;">修改地址</a>
+        <a v-if="showAddress"  @click="openAddressEdit(showAddress)" href="javascript:;">修改地址</a>
       </div>
       <div class="action">
-        <XtxButton @click="visibleDialog=true" class="btn">切换地址</XtxButton>
-        <XtxButton class="btn">添加地址</XtxButton>
+        <XtxButton @click="openDialog" class="btn">切换地址</XtxButton>
+        <XtxButton @click="openAddressEdit" class="btn">添加地址</XtxButton>
       </div>
     </div>
     <XtxDialog title="切换收货地址" v-model:visible="visibleDialog">
+      <div @click="selectedAddress=item" :class="{active:selectedAddress&&selectedAddress.id===item.id}" class="text item" v-for="item in list" :key="item.id">
+        <ul>
+          <li><span>收<i/>货<i/>人：</span>{{item.receiver}}</li>
+          <li><span>联系方式：</span>{{item.contact.replace(/^(\d{3})\d{4}(\d{4})/,'$1****$2')}}</li>
+          <li><span>收货地址：</span>{{item.fullLocation.replace(/ /g,'')+item.address}}</li>
+        </ul>
+      </div>
         <template v-slot:footer>
             <XtxButton  @click="visibleDialog=false" type="gray" style="margin-right:20px">取消</XtxButton>
-            <XtxButton @click="visibleDialog=false" type="primary">确认</XtxButton>
+            <XtxButton @click="confirmAddressFn" type="primary">确认</XtxButton>
         </template>
     </XtxDialog>
+    <!-- 添加编辑 -->
+    <AddressEdit ref="addressEditCom" @on-success="successHandler"/>
   </template>
 <script>
 import { ref } from 'vue'
+import AddressEdit from './address-edit.vue'
 export default {
   name: 'CheckoutAddress',
+  components: { AddressEdit },
   props: {
     list: {
       type: Array,
@@ -45,11 +56,68 @@ export default {
     }
     emit('change', showAddress.value && showAddress.value.id)
     const visibleDialog = ref(false)
-    return { showAddress, visibleDialog }
+    const selectedAddress = ref(null)
+    const confirmAddressFn = () => {
+      showAddress.value = selectedAddress.value
+      emit('change', selectedAddress.value.id)
+      visibleDialog.value = false
+    }
+    const openDialog = () => {
+      selectedAddress.value = null
+      visibleDialog.value = true
+    }
+    const addressEditCom = ref(null)
+    const openAddressEdit = (address) => {
+      addressEditCom.value.open(address)
+    }
+    const successHandler = (formData) => {
+      const address = props.list.find(item => item.id === formData.id)
+      if (address) {
+        for (const key in address) {
+          address[key] = formData[key]
+        }
+      } else {
+        const jsonStr = JSON.stringify(formData)
+        // eslint-disable-next-line vue/no-mutating-props
+        props.list.unshift(jsonStr)
+      }
+    }
+    return {
+      showAddress,
+      visibleDialog,
+      selectedAddress,
+      confirmAddressFn,
+      openDialog,
+      openAddressEdit,
+      addressEditCom,
+      successHandler
+    }
   }
 }
 </script>
   <style scoped lang="less">
+  .xtx-dialog {
+    .text {
+    flex: 1;
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    &.item {
+      border: 1px solid #f5f5f5;
+      margin-bottom: 10px;
+      cursor: pointer;
+      &.active,&:hover {
+        border-color: @xtxColor;
+        background: lighten(@xtxColor,50%);
+      }
+      > ul {
+        padding: 10px;
+        font-size: 14px;
+        line-height: 30px;
+      }
+    }
+  }
+  }
   .checkout-address {
     border: 1px solid #f5f5f5;
     display: flex;

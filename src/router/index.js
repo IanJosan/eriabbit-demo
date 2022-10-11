@@ -9,6 +9,10 @@ const Cart = () => import('@/views/cart/index')
 const Login = () => import('@/views/login')
 const LoginCallback = () => import('@/views/login/callback')
 const PayCheckout = () => import('@/views/member/pay/checkout')
+const PayIndex = () => import('@/views/member/pay/index')
+const PayResult = () => import('@/views/member/pay/components/result')
+const MemberLayout = () => import('@/views/member/Layout')
+const MemberHome = () => import('@/views/member/home')
 const routes = [
   // 一级路由
   {
@@ -20,7 +24,17 @@ const routes = [
       { path: '/category/sub/:id', component: subCategory },
       { path: '/product/:id', component: Goods },
       { path: '/cart', component: Cart },
-      { path: '/member/checkout', component: PayCheckout }
+      { path: '/member/checkout', component: PayCheckout },
+      { path: '/member/pay', component: PayIndex },
+      { path: '/pay/callback', component: PayResult },
+      {
+        path: '/member',
+        component: MemberLayout,
+        children: [
+          { path: '/member', component: MemberHome }
+        ]
+      }
+
     ]
   },
   { path: '/login', component: Login },
