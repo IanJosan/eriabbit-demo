@@ -22,3 +22,15 @@ export const submitOrder = (order) => {
 export const findOrderDetail = (id) => {
   return request('/member/order/' + id, 'get')
 }
+
+export const findOrderList = ({ orderState, page, pageSize }) => {
+  return request('/member/order', 'get', { orderState, page, pageSize })
+}
+
+export const cancelOrder = (orderId, cancelReason) => {
+  return request(`/member/order/${orderId}/cancel`, 'put', { cancelReason })
+}
+
+export const delteOrder = (ids) => {
+  return request('/member/order', 'delete', { ids })
+}
