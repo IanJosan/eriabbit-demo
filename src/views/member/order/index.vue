@@ -10,7 +10,12 @@
     <div class="order-list">
       <div v-if="loading" class="loading"></div>
       <div class="none" v-if="!loading && orderList.length === 0">暂无数据</div>
-      <OrderItem @on-delete="handlerDelete" @on-cancel="handlerCancel" v-for="item in orderList" :key="item.id" :order="item"/>
+      <OrderItem
+      @on-delete="handlerDelete"
+      @on-cancel="handlerCancel"
+      @on-logistics="handlerLogistics"
+      @on-confirm ='handlerConfirm'
+       v-for="item in orderList" :key="item.id" :order="item"/>
     </div>
     <!-- 分页 -->
     <XtxPagination
@@ -22,17 +27,19 @@
   </XtxPagination>
   <!-- 取消原因 -->
   <OrderCancel ref="orderCancelCom"/>
+  <!-- 物流详情 -->
+  <OrderLogistics ref="orderLogisticsCom"/>
   </div>
 </template>
 <script>
 import { ref, reactive, watch } from 'vue'
 import { orderStatus } from '@/api/constants'
 import OrderItem from './components/order-item.vue'
-import { findOrderList, deleteOrder } from '@/api/order'
+import { findOrderList, deleteOrder, confirmOrder } from '@/api/order'
 import OrderCancel from './components/order-cancel.vue'
 import confirm from '@/components/library/confirm'
 import Message from '@/components/library/Message'
-
+import OrderLogistics from './components/order-logistics.vue'
 export default {
   name: 'MemberOrder',
   setup () {
@@ -64,6 +71,7 @@ export default {
       requestParams.page = 1
       requestParams.orderState = index
     }
+
     const handlerDelete = (order) => {
       confirm({ text: '确认删除' }).then(() => {
         deleteOrder(order.id).then(() => {
@@ -74,16 +82,34 @@ export default {
 
       })
     }
-    return { activeName, tabClick, orderStatus, orderList, loading, total, requestParams, ...useCancel(), handlerDelete }
+    return { activeName, tabClick, orderStatus, orderList, loading, total, requestParams, ...useCancel(), handlerDelete, ...useLogistics(), ...useConfirm() }
   },
-  components: { OrderItem, OrderCancel }
+  components: { OrderItem, OrderCancel, OrderLogistics }
 }
-const useCancel = () => {
+export const useCancel = () => {
   const orderCancelCom = ref(null)
   const handlerCancel = (order) => {
     orderCancelCom.value.open(order)
   }
   return { handlerCancel, orderCancelCom }
+}
+export const useConfirm = () => {
+  const handlerConfirm = (order) => {
+    confirm({ text: '确认收货' }).then(() => {
+      confirmOrder(order.id).then(() => {
+        Message({ text: '确认成功', type: 'success' })
+        order.orderState = 4
+      })
+    })
+  }
+  return { handlerConfirm }
+}
+export const useLogistics = () => {
+  const orderLogisticsCom = ref(null)
+  const handlerLogistics = (order) => {
+    orderLogisticsCom.value.open(order)
+  }
+  return { handlerLogistics, orderLogisticsCom }
 }
 </script>
 <style scoped lang="less">

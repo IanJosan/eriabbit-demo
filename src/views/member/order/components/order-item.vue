@@ -15,7 +15,7 @@
         <div class="column goods">
           <ul>
             <li v-for="goods in order.skus" :key="goods.id">
-              <router-link class="image" :to="`/product/${goods.id}`">
+              <router-link class="image" :to="`/product/${goods.skuId}`">
                 <img :src="goods.image" alt="" />
               </router-link>
               <div class="info">
@@ -32,7 +32,7 @@
           <!-- 待收货：查看物流 -->
           <!-- 待评价：评价商品 -->
           <!-- 已完成：查看评价 -->
-          <p v-if="order.orderState===3"><a href="javascript:;" class="green">查看物流</a></p>
+          <p v-if="order.orderState===3"><a href="javascript:;" class="green" @click="$emit('on-logistics',order),order">查看物流</a></p>
           <p v-if="order.orderState===4"><a href="javascript:;" class="green">评价商品</a></p>
           <p v-if="order.orderState===5"><a href="javascript:;" class="green">查看评价</a></p>
         </div>
@@ -49,10 +49,10 @@
           <!-- 已完成：查看详情，再次购买，申请售后 -->
           <!-- 已取消：查看详情 -->
           <XtxButton @click="$router.push(`/member/pay?orderId=${order.id}`)" v-if="order.orderState===1" type="primary" size="small">立即付款</XtxButton>
-          <XtxButton v-if="order.orderState===3" type="primary" size="small">确认收货</XtxButton>
+          <XtxButton v-if="order.orderState===3" type="primary" @click="$emit('on-confirm',order)" size="small">确认收货</XtxButton>
           <p><a @click="$router.push(`/member/order/${order.id}`)" href="javascript:;">查看详情</a></p>
           <p @click="$emit('on-cancel',order)" v-if="order.orderState===1"><a href="javascript:;">取消订单</a></p>
-          <p v-if="[2,3,4,5].includes(order.orderState)"><a href="javascript:;">再次购买</a></p>
+          <p v-if="[2,3,4,5].includes(order.orderState)"><a href="javascript:;"  @click="$router.push(`/member/checkout?orderId=${order.id}`)">再次购买</a></p>
           <p v-if="[4,5].includes(order.orderState)"><a href="javascript:;">申请售后</a></p>
         </div>
       </div>
@@ -70,7 +70,7 @@ export default {
       default: () => ({})
     }
   },
-  emits: ['on-cancel', 'on-delete'],
+  emits: ['on-cancel', 'on-delete', 'on-logistics', 'on-confirm'],
   setup (props) {
     const { start, timeText } = usePayTime()
     start(props.order.countdown)
